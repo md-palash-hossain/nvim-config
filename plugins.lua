@@ -1,12 +1,11 @@
 local plugins = {
   {
     "rcarriga/nvim-dap-ui",
-    event = "VeryLazy",
     dependencies = "mfussenegger/nvim-dap",
     config = function()
       local dap = require("dap")
       local dapui = require("dapui")
-      require("dapui").setup()
+      dapui.setup()
       dap.listeners.after.event_initialized["dapui_config"] = function()
         dapui.open()
       end
@@ -20,42 +19,41 @@ local plugins = {
   },
   {
     "mfussenegger/nvim-dap",
-    config = function()
-      require "custom.configs.dap"
+    config = function(_, opts)
       require("core.utils").load_mappings("dap")
     end
   },
   {
+    "mfussenegger/nvim-dap-python",
+    ft = "python",
+    dependencies = {
+      "mfussenegger/nvim-dap",
+      "rcarriga/nvim-dap-ui",
+    },
+    config = function(_, opts)
+      local path = "~/.local/share/nvim/mason/packages/debugpy/venv/bin/python"
+      require("dap-python").setup(path)
+      require("core.utils").load_mappings("dap_python")
+    end,
+  },
+  {
     "jose-elias-alvarez/null-ls.nvim",
-    event = "VeryLazy",
+    ft = {"python"},
     opts = function()
       return require "custom.configs.null-ls"
     end,
   },
-  -- {
-  --   "mhartington/formatter.nvim",
-  --   event = "VeryLazy",
-  --   opts = function()
-  --     return require "custom.configs.formatter"
-  --   end
-  -- },
-  -- {
-  --   "mfussenegger/nvim-lint",
-  --   event = "VeryLazy",
-  --   config = function()
-  --     require "custom.configs.lint"
-  --   end
-  -- },
   {
     "williamboman/mason.nvim",
     opts = {
       ensure_installed = {
-        "eslint-lsp",
-        "js-debug-adapter",
-        "prettier",
-        "typescript-language-server"
-      }
-    }
+        "black",
+        "debugpy",
+        "mypy",
+        "ruff",
+        "pyright",
+      },
+    },
   },
   {
     "neovim/nvim-lspconfig",
